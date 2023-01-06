@@ -1,11 +1,15 @@
 package vttp2022.paf.assessment.eshop.controllers;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,7 +22,11 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import vttp2022.paf.assessment.eshop.models.Customer;
+import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
+import vttp2022.paf.assessment.eshop.models.OrderStatus;
 import vttp2022.paf.assessment.eshop.respositories.CustomerRepository;
 import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
 import vttp2022.paf.assessment.eshop.services.WarehouseService;
@@ -90,4 +98,51 @@ public class OrderController {
                 .body(resp.toString());
     }
 
-}
+	@PostMapping(value = "/dispatch", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> dispatchOrder(@RequestBody MultiValueMap<String, String> form) {
+		System.out.println(form.getFirst("name"));
+		String name = form.getFirst("name");
+
+		// Step a: Query to see if customer exists
+		Optional<Customer> opt = custRepo.findCustomerByName(name);
+
+		JsonObjectBuilder bld = Json.createObjectBuilder();
+
+		if (opt.isEmpty()) {
+			bld.add("error", "Customer <%s> not found".formatted(name));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON).body(bld.build().toString());
+		}
+
+		Customer c = opt.get();
+		return null;
+
+		String order_Id = UUID.randomUUID().toString().substring(0,8);
+		System.out.println(order_Id);
+
+		Order o = new Order();
+		o.setOrderId(order_Id);
+		o.setCustomer(c);
+
+		String item_name = form.getFirst("item");
+		Integer quantity = Integer.parseInt(form.getFirst("quantity"));
+
+		List<LineItem> items = new LinkedList<>();
+		LineItem li = new LineItem();
+		li.setItem(item_name);
+		li.setQuantity(quantity);
+		System.out.println(item_name);
+
+		o.setLineItems(items);
+
+		try {
+			orderRepo.saveOrder(o);
+			} catch (Exception ex) {
+				bld.add("error", ex.getMessage());
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(bld.toString());
+			}
+
+
+		OrderStatus os = warehouseSvc.dispatch(o);
+
+
+}}

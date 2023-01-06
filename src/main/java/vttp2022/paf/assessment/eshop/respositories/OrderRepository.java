@@ -58,4 +58,7 @@ public class OrderRepository {
 {  
 UUID uuid=UUID.randomUUID(); //Generates random UUID  
 System.out.println(uuid);  
-} }
+}
+
+	public void saveOrder(Order o) {
+	} }
