@@ -19,11 +19,19 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import vttp2022.paf.assessment.eshop.models.Order;
+import vttp2022.paf.assessment.eshop.respositories.CustomerRepository;
+import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
 import vttp2022.paf.assessment.eshop.services.WarehouseService;
 
 @RestController
-@RequestMapping(path = "/api/eshop", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/order", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
+
+	@Autowired
+	private CustomerRepository custRepo;
+
+	@Autowired
+	private OrderRepository orderRepo;
 
     @Autowired
     private WarehouseService wareSvc;
