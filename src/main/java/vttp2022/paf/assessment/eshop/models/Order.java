@@ -15,7 +15,14 @@ public class Order {
 	private String status;
 	private Date orderDate = new Date();
 	private List<LineItem> lineItems = new LinkedList<>();
+	private String createdBy;
 
+	public String getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 	public String getOrderId() { return this.orderId; }
 	public void setOrderId(String orderId) { this.orderId = orderId; }
 
@@ -53,5 +60,8 @@ public class Order {
 	public List<LineItem> getLineItems() { return this.lineItems; }
 	public void setLineItems(List<LineItem> lineItems) { this.lineItems = lineItems; }
 	public void addLineItem(LineItem lineItem) { this.lineItems.add(lineItem); }
+	public static Order create(String json) {
+		return null;
+	}
 }
 
